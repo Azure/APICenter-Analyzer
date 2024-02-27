@@ -1,0 +1,1 @@
+export type AnalysisState = "started" | "completed" | "failed" | "none";
