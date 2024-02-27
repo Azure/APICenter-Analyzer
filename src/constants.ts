@@ -8,7 +8,7 @@ import * as path from "path";
 /// Customizable constants
 
 /** File name for your ruleset file, this should correspond to the file name in the `resources/rulesets` folder */
-export const RulesetFileName = "oas.yml";
+export const RulesetFileName = "oas.yaml";
 /** Folder name for your ruleset file, this should correspond to the folder name in the `resources` folder */
 export const RulesetFolderName = "rulesets";
 
