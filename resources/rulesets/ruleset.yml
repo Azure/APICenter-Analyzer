@@ -1,0 +1,98 @@
+extends: [[spectral:oas, all]]
+functionsDir: './functions'
+functions:
+  - Function_StringTypeLengthMinMax
+rules:
+  oas3-valid-schema-example: warn
+  info-license: off
+  license-url: off
+  oas3-valid-media-example: off
+  info-contact: off
+  oas2-api-host: off
+  oas2-api-schemes: off
+  oas2-unused-definition: off
+  openapi-tags: off
+  openapi-tags-alphabetical: off
+  tag-description: off
+
+  custom-field-type-is-required:
+    description: All Fields should have a type defined.
+    message: '{{property}} must be defined.'
+    formats: [oas3]
+    resolved: true
+    given:
+      - $.paths.*.*.parameters.schema
+      - $.paths.*.*.requestBody.example.*.*
+      - $.paths.*.*.responses.*.example.*
+      - $.paths.*.*.responses.*.example.*.*
+    severity: warn
+    then: 
+      field: type
+      function: defined
+
+  custom-model-names-should-NOT-begin-with-digits:
+    description: Model Names should NOT begin with digits [0 thru 9]
+    message: 'Model Names should NOT begin with digits [0 thru 9] - Please rename {{property}} Model.'
+    formats: [oas3]
+    resolved: true
+    given: $.components.schemas
+    severity: error
+    then: 
+      field: "@key"
+      function: pattern
+      functionOptions: 
+        notMatch: "^[0-9]"
+        
+  custom-no-HTML-markdown-in-description:
+    description: Field description should not include HTML or Markdown syntax Ex. [<HTMLtags>].
+    message: 'Field descriptions should not inculde HTML or Markdown syntax. Ex. [<HTMLtags>]'
+    formats: [oas3]
+    resolved: true
+    given: $..description
+    severity: error
+    then: 
+      function: pattern
+      functionOptions: 
+        notMatch: '[<>]'
+
+  custom-request-and-response-example-defined:
+    description: Every request and response should have examples associated with it.
+    message: 'This Request or Response should have a {{property}} defined.'
+    formats: [oas3]
+    resolved: true
+    severity: error
+    given:
+    - $..responses.*.content.*
+    - $..requestBody.content.application/json
+    then: 
+      field: "example"
+      function: defined
+
+  custom-request-and-response-example-value:
+    description: Examples should have a value.
+    message: 'Missing {{property}} value.'
+    formats: [oas3]
+    resolved: true
+    severity: warn
+    given:   
+    - $..responses.*.content.*
+    - $..requestBody.content.application/json
+    then:
+      field: "example"
+      function: truthy
+
+  custom-string-type-length:
+    description: 'string schemas should have explicit boundaries (Min/Max length).'
+    severity: warn
+    formats: [oas3]
+    resolved: true
+    message: '{{error}}'
+    given:
+    - $.paths[*][parameters][*]
+    - $.paths[*][parameters][*].schema
+    - $.paths[*][parameters][*].content[*].schema
+    - $.paths[*][*][parameters][*].schema
+    - $.paths[*][*][parameters][*].content[*].schema
+    - $.paths[*][*].requestBody.content[*].schema
+    then: 
+      function: Function_StringTypeLengthMinMax
