@@ -5,17 +5,17 @@
 - :bulb: [What is Azure API Center?](#bulb-what-is-azure-api-center)
   - :briefcase: API Governance & Azure API Center
   - :briefcase: API Analysis in Azure API Center (Overview)
-- :rocket: [How to Run](#rocket-how-to-run-api-analysis)
-  - :wrench: Configure your environment
-  - :wrench: Configure & run your function locally
-- :cloud: [How to deploy](#cloud-how-to-deploy)
-- :page_facing_up: [Custom Ruleset](#page_facing_up-custom-ruleset)
+- :rocket: [How to Run](#rocket-how-to-set-up-api-analysis)
+  - :wrench: How to deploy
+  - :cloud: How to debug your function locally
+- :page_facing_up: [Custom Ruleset](#page_facing_up-custom-rulesets)
+- :computer: [Support](#computer-support)
 - :pencil2: [Contributing](#pencil2-contributing)
 - :book: [Code of Conduct](#book-code-of-conduct)
 - :v: [Trademark Notice](#v-trademark-notice)
 - :bar_chart: [Telemetry](#bar_chart-telemetry)
 
-# :bulb: What is Azure API Center?
+## :bulb: What is Azure API Center?
 
 [Azure API Center](https://learn.microsoft.com/en-us/azure/api-center/overview) is a service that helps you develop and maintain a structured inventory of your organization’s APIs. With API Center, you can track all of your APIs in a centralized location, regardless of their type, lifecycle stage, or deployment location. API Center enables API discovery, reuse, and governance empowering API Platform Teams.
 
@@ -34,7 +34,7 @@ To facilitate robust API governance, we're excited to introduce **API Analysis**
 Here is a high-level overview of how API analysis works in Azure API Center
 ![Overview](./images/overview.png)
 
-## :rocket: How to Run API Analysis
+## :rocket: How to set up API Analysis
 
 ### :wrench: Configure your environment
 
@@ -42,27 +42,37 @@ Before you get started, make sure you have the following requirements in place:
 
 - An Azure account with an active subscription. [Create an account for free](https://azure.microsoft.com/free/?ref=microsoft.com&utm_source=microsoft.com&utm_medium=docs&utm_campaign=visualstudio).
 - An API Center instance.
-- [Node.js 18.x](https://nodejs.org/en/download/releases/) or above. Use the `node --version` command to check your version.
-- [TypeScript 4.x](https://www.typescriptlang.org/). Use the `tsc -v` command to check your version.
 - [Visual Studio Code](https://code.visualstudio.com/) on one of the [supported platforms](https://code.visualstudio.com/docs/supporting/requirements#_platforms).
 - The [Azure Functions extension v1.10.4](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions) or above for Visual Studio Code.
-- [Azure Functions Core Tools v4.0.5382 or above](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=windows%2Cisolated-process%2Cnode-v4%2Cpython-v2%2Chttp-trigger%2Ccontainer-apps&pivots=programming-language-typescript#install-the-azure-functions-core-tools).
 
-### :wrench: Configure & run your function locally
-
-- Clone the APICenter-Analyzer repository to your local machine <TODO: insert link>
-- Open the Project in Visual Studio Code
-- To start the function locally, press F5 or the Run and Debug icon in the left-hand side Activity bar. The Terminal panel displays the Output from Core Tools. Your app starts in the Terminal panel. You can see the URL endpoint of your HTTP-triggered function running locally. (If you have trouble running on Windows, make sure that the default terminal for Visual Studio Code isn't set to WSL Bash.)
-
-## :cloud: How to deploy
+### :cloud: How to deploy
 
 Follow the instructions in [Quickstart: Create a function in Azure with TypeScript using Visual Studio Code](https://learn.microsoft.com/en-us/azure/azure-functions/create-first-function-vs-code-typescript?pivots=nodejs-model-v4#sign-in-to-azure). Start from the "Sign in to Azure" section and complete all subsequent sections.
 
-## :page_facing_up: Custom Ruleset
+### :wrench: Configure & run your function locally
+
+To debug your Azure function locally. You'll need the following dependencies:
+
+- [Node.js 18.x](https://nodejs.org/en/download/releases/) or above. Use the `node --version` command to check your version.
+- [TypeScript 4.x](https://www.typescriptlang.org/). Use the `tsc -v` command to check your version.
+- [Azure Functions Core Tools v4.0.5382 or above](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=windows%2Cisolated-process%2Cnode-v4%2Cpython-v2%2Chttp-trigger%2Ccontainer-apps&pivots=programming-language-typescript#install-the-azure-functions-core-tools).
+
+After the dependencies are installed, follow these steps to debug the event triggered Azure function:
+
+- Open the Project in Visual Studio Code
+- Set a breakpoint
+- To start the function locally, press `F5` or the Run and Debug icon in the left-hand side Activity bar. The Terminal panel should display the Output from Azure Functions Core Tools.
+- Follow the instructions in [Test your Event Grid handler locally](https://learn.microsoft.com/en-us/azure/communication-services/how-tos/event-grid/local-testing-event-grid) to trigger the function.
+
+## :page_facing_up: Custom rulesets
 
 This template provides you with the default OAS (OpenAPI Specification) ruleset from Spectral. To see the exact rules within the ruleset, see [OpenAPI Rules](https://docs.stoplight.io/docs/spectral/4dec24461f3af-open-api-rules).
 
-If you want to customize your Ruleset for analysis, simply swap out the default ruleset file oas.yaml located in `{workSpaceFolder}/resources/rulesets` with any valid Spectral ruleset file. We accept all valid Spectral formats (YAML, JSON, and JavaScript). Afterward, head over to the `{workSpaceFolder}/src/constants.ts` file and update the `RulesetFileName` constant with your chosen ruleset file name.
+If you want to customize your Ruleset for analysis, simply swap out the default ruleset file oas.yaml located in `{workSpaceFolder}/resources/rulesets` with any valid Spectral ruleset file. We accept all valid Spectral formats (YAML, JSON). Afterward, head over to the `{workSpaceFolder}/src/constants.ts` file and update the `RulesetFileName` constant with your chosen ruleset file name.
+
+## :computer: Support
+
+See [SUPPORT.md](./SUPPORT.md)
 
 ## :pencil2: Contributing
 
