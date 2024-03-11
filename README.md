@@ -2,18 +2,18 @@
 
 ## Overview
 
-- :bulb: [What is Azure API Center?](#-what-is-azure-api-center)
+- :bulb: [What is Azure API Center?](#bulb-what-is-azure-api-center)
   - :briefcase: API Governance & Azure API Center
   - :briefcase: API Analysis in Azure API Center (Overview)
-- :rocket: [How to Run](#-how-to-run-api-analysis)
+- :rocket: [How to Run](#rocket-how-to-run-api-analysis)
   - :wrench: Configure your environment
   - :wrench: Configure & run your function locally
-- :cloud: [How to deploy](#-how-to-deploy)
-- :page_facing_up: [Custom Ruleset](#-custom-ruleset)
-- :pencil2: [Contributing](#-contributing)
-- :book: [Code of Conduct](#-code-of-conduct)
-- :v: [Trademark Notice](#-trademark-notice)
-- :bar_chart: [Telemetry](#-telemetry)
+- :cloud: [How to deploy](#cloud-how-to-deploy)
+- :page_facing_up: [Custom Ruleset](#page_facing_up-custom-ruleset)
+- :pencil2: [Contributing](#pencil2-contributing)
+- :book: [Code of Conduct](#book-code-of-conduct)
+- :v: [Trademark Notice](#v-trademark-notice)
+- :bar_chart: [Telemetry](#bar_chart-telemetry)
 
 # :bulb: What is Azure API Center?
 
