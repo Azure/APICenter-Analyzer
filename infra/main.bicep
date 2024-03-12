@@ -16,12 +16,15 @@ param environmentName string
 ])
 param location string
 
-@description('Should monitoring resources be deployed?')
+@description('Should monitoring resources be provisioned?')
 @allowed([
   'yes'
   'no'
 ])
 param useMonitoring string
+
+@description('API Center instance name to connect. (e.g. apic-linter1234, etc.) If not provided, a new API Center instance will be provisioned.')
+param apicName string
 
 // Tags that should be applied to all resources.
 //
@@ -46,6 +49,10 @@ module resources './resources.bicep' = {
     suffix: 'linter'
     location: location
     useMonitoring: useMonitoring == 'yes' ? true : false
+    apicName: apicName
     tags: tags
   }
 }
+
+output USE_MONITORING string = useMonitoring
+output APIC_NAME string = apicName

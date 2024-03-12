@@ -19,12 +19,12 @@ hooks:
     windows:
       shell: pwsh
       run: |
-        ./infra/Run-PostDeploy.ps1 -Environment "${env:AZURE_ENV_NAME}"
+        ./infra/Run-PostDeploy.ps1 -Environment "${env:AZURE_ENV_NAME}" -ApicName "${env:APIC_NAME}"
       continueOnError: false
       interactive: false
     posix:
       shell: sh
       run: |
-        ./infra/run-postdeploy.sh --environment "${AZURE_ENV_NAME}"
+        ./infra/run-postdeploy.sh --environment "${AZURE_ENV_NAME}" --apic-name "${APIC_NAME}"
       continueOnError: false
       interactive: false

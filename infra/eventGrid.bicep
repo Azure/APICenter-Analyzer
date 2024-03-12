@@ -1,27 +1,25 @@
 param environmentName string
 param suffix string = 'linter'
 param location string = resourceGroup().location
+param apicName string = ''
+param apicId string = ''
 
 param tags object = {}
 
 var longname = '${environmentName}${suffix == null || suffix == '' ? '' : '-'}${suffix}'
 
-resource apic 'Microsoft.ApiCenter/services@2024-03-01' existing = {
+resource apic 'Microsoft.ApiCenter/services@2024-03-01' existing = if (apicId == null || apicId == '') {
   name: 'apic-${environmentName}'
 }
 
 resource evtgrdSystemTopic 'Microsoft.EventGrid/systemTopics@2023-12-15-preview' = {
-  name: 'evtgrdtpc-apic-${longname}-on-api-definition-added-or-updated'
+  name: 'evtgrdtpc-${apicName != null && apicName != '' ? apicName : 'apic-${environmentName}'}-on-api-definition-added-or-updated'
   location: location
   tags: tags
   properties: {
-    source: apic.id
+    source: apicId != null && apicId != '' ? apicId : apic.id
     topicType: 'Microsoft.ApiCenter.Services'
   }
-}
-
-resource fncappFunction 'Microsoft.Web/sites/functions@2023-01-01' existing = {
-  name: 'fncapp-${longname}/apicenter-analyzer'
 }
 
 resource evtgrdSystemTopicSubscription 'Microsoft.EventGrid/systemTopics/eventSubscriptions@2023-12-15-preview' = {
@@ -30,9 +28,7 @@ resource evtgrdSystemTopicSubscription 'Microsoft.EventGrid/systemTopics/eventSu
   properties: {
     destination: {
       properties: {
-        resourceId: fncappFunction.id
-        maxEventsPerBatch: 1
-        preferredBatchSizeInKilobytes: 64
+        resourceId: resourceId('rg-${environmentName}', 'Microsoft.Web/sites/functions', 'fncapp-${longname}', 'apicenter-analyzer')
       }
       endpointType: 'AzureFunction'
     }
@@ -41,13 +37,7 @@ resource evtgrdSystemTopicSubscription 'Microsoft.EventGrid/systemTopics/eventSu
         'Microsoft.ApiCenter.ApiDefinitionAdded'
         'Microsoft.ApiCenter.ApiDefinitionUpdated'
       ]
-      enableAdvancedFilteringOnArrays: true
     }
-    labels: []
     eventDeliverySchema: 'EventGridSchema'
-    retryPolicy: {
-      maxDeliveryAttempts: 30
-      eventTimeToLiveInMinutes: 1440
-    }
   }
 }

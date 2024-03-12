@@ -2,13 +2,14 @@ param environmentName string
 param suffix string = 'linter'
 param location string = resourceGroup().location
 param useMonitoring bool = true
+param apicName string = ''
 
 param tags object = {}
 
 var shortname = '${replace(replace(environmentName, '-', ''), '_', '')}${suffix}'
 var longname = '${environmentName}${suffix == null || suffix == '' ? '' : '-'}${suffix}'
 
-resource apic 'Microsoft.ApiCenter/services@2024-03-01' = {
+resource apic 'Microsoft.ApiCenter/services@2024-03-01' = if (apicName == null || apicName == '') {
   name: 'apic-${environmentName}'
   location: location
   tags: tags
@@ -17,7 +18,7 @@ resource apic 'Microsoft.ApiCenter/services@2024-03-01' = {
   }
 }
 
-resource apicWorkspace 'Microsoft.ApiCenter/services/workspaces@2024-03-01' = {
+resource apicWorkspace 'Microsoft.ApiCenter/services/workspaces@2024-03-01' = if (apicName == null || apicName == '') {
   name: 'default'
   parent: apic
   properties: {
@@ -161,12 +162,12 @@ resource fncappPolicies 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@
   }
 }]
 
-resource contributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+resource contributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = if (apicName == null || apicName == '') {
   scope: apic
   name: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
 }
 
-resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (apicName == null || apicName == '') {
   name: guid(resourceGroup().id, fncapp.id, contributorRoleDefinition.id)
   scope: apic
   properties: {
