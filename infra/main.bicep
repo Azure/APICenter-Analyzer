@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
 @minLength(1)
-@maxLength(64)
+@maxLength(18)
 @description('Name of the environment that can be used as part of naming resource convention')
 param environmentName string
 
@@ -15,6 +15,13 @@ param environmentName string
   'westeurope'
 ])
 param location string
+
+@description('Should monitoring resources be deployed?')
+@allowed([
+  'yes'
+  'no'
+])
+param useMonitoring string
 
 // Tags that should be applied to all resources.
 //
@@ -38,6 +45,7 @@ module resources './resources.bicep' = {
     environmentName: environmentName
     suffix: 'linter'
     location: location
+    useMonitoring: useMonitoring == 'yes' ? true : false
     tags: tags
   }
 }

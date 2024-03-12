@@ -44,8 +44,12 @@ $RESOURCE_GROUP_NAME = "rg-$AZURE_ENV_NAME"
 $repositoryRoot = git rev-parse --show-toplevel
 
 # Provision Azure Event Grid
+Write-Output "Provisioning Azure Event Grid ..."
+
 $evtgrd = az deployment group create `
     -g $RESOURCE_GROUP_NAME `
     -n "eventgrid-$AZURE_ENV_NAME" `
     --template-file "$($repositoryRoot)/infra/eventGrid.bicep" `
     --parameters environmentName="$AZURE_ENV_NAME"
+
+Write-Output "... Provisioned"

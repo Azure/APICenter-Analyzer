@@ -1,10 +1,11 @@
 param environmentName string
 param suffix string = 'linter'
 param location string = resourceGroup().location
+param useMonitoring bool = true
 
 param tags object = {}
 
-var shortname = '${environmentName}${suffix}'
+var shortname = '${replace(replace(environmentName, '-', ''), '_', '')}${suffix}'
 var longname = '${environmentName}${suffix == null || suffix == '' ? '' : '-'}${suffix}'
 
 resource apic 'Microsoft.ApiCenter/services@2024-03-01' = {
@@ -38,7 +39,7 @@ resource st 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   }
 }
 
-resource wrkspc 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
+resource wrkspc 'Microsoft.OperationalInsights/workspaces@2022-10-01' = if (useMonitoring == true) {
   name: 'wrkspc-${longname}'
   location: location
   tags: tags
@@ -55,7 +56,7 @@ resource wrkspc 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   }
 }
 
-resource appins 'Microsoft.Insights/components@2020-02-02' = {
+resource appins 'Microsoft.Insights/components@2020-02-02' = if (useMonitoring == true) {
   name: 'appins-${longname}'
   location: location
   kind: 'web'
@@ -83,6 +84,45 @@ resource csplan 'Microsoft.Web/serverfarms@2023-01-01' = {
   }
 }
 
+var commonSettings = [
+  {
+    name: 'AzureWebJobsStorage'
+    value: 'DefaultEndpointsProtocol=https;AccountName=${st.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${st.listKeys().keys[0].value}'
+  }
+  {
+    name: 'FUNCTION_APP_EDIT_MODE'
+    value: 'readonly'
+  }
+  {
+    name: 'FUNCTIONS_EXTENSION_VERSION'
+    value: '~4'
+  }
+  {
+    name: 'FUNCTIONS_WORKER_RUNTIME'
+    value: 'node'
+  }
+  {
+    name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+    value: 'DefaultEndpointsProtocol=https;AccountName=${st.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${st.listKeys().keys[0].value}'
+  }
+  {
+    name: 'WEBSITE_CONTENTSHARE'
+    value: 'fncapp-${longname}'
+  }
+]
+
+var appSettings = concat(commonSettings, useMonitoring == true ? [
+    {
+      name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+      value: useMonitoring == true ? appins.properties.InstrumentationKey : null
+    }
+    {
+      name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+      value: useMonitoring == true ? appins.properties.ConnectionString : null
+    }
+  ] : []
+)
+
 resource fncapp 'Microsoft.Web/sites@2023-01-01' = {
   name: 'fncapp-${longname}'
   location: location
@@ -96,40 +136,7 @@ resource fncapp 'Microsoft.Web/sites@2023-01-01' = {
     httpsOnly: true
     reserved: true
     siteConfig: {
-      appSettings: [
-        {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: appins.properties.InstrumentationKey
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: appins.properties.ConnectionString
-        }
-        {
-          name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${st.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${st.listKeys().keys[0].value}'
-        }
-        {
-          name: 'FUNCTION_APP_EDIT_MODE'
-          value: 'readonly'
-        }
-        {
-          name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~4'
-        }
-        {
-          name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: 'node'
-        }
-        {
-          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${st.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${st.listKeys().keys[0].value}'
-        }
-        {
-          name: 'WEBSITE_CONTENTSHARE'
-          value: 'fncapp-${longname}'
-        }
-      ]
+      appSettings: appSettings
       linuxFxVersion: 'Node|18'
     }
   }
