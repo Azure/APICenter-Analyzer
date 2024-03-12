@@ -71,7 +71,7 @@ else {
 
         $rdId = az role definition list -n "b24988ac-6180-42a0-ab88-20f7382dd24c" --scope $apicId --query "[0].id" -o tsv
         $principalId = az resource list -n "fncapp-$AZURE_ENV_NAME-linter" --query "[0].identity.principalId" -o tsv
-        $role = az role assignment create --role $rdId --scope $apicId --assignee-object-id $principalId --assignee-principal-type ServicePrincipal
+        $assigned = az role assignment create --role $rdId --scope $apicId --assignee-object-id $principalId --assignee-principal-type ServicePrincipal
 
         Write-Output "... Assigned"
     }
