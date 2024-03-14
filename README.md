@@ -84,6 +84,14 @@ Alternatively, if you'd like to use [Azure Developer CLI](https://learn.microsof
    - The `apicName` parameter: Enter the API Center instance name to connect the analyzer to &ndash; if it's provided, the analyzer will be attached to the API Center instance; otherwise, a new API Center instance will be provisioned and connected.
    - The `useMonitoring` parameter: Choose `yes` or `no` &ndash; if you choose `yes`, both Application Insights and Log Analytics will be provisioned; otherwise, both won't be provisioned.
 
+   You will get the following Azure resources provisioned:
+
+   - Azure Functions
+   - Storage Account
+   - API Center (if `apicName` is not provided)
+   - Application Insights (if `useMonitoring` is set to `yes`)
+   - Log Analytics (if `useMonitoring` is set to `yes`)
+
 ### :wrench: Configure & run your function locally
 
 To debug your Azure function locally. You'll need the following dependencies:
