@@ -54,6 +54,7 @@ if (($ApicName -eq $null) -or ($ApicName -eq "")) {
     Write-Output "Azure Event Grid will be connected to the new API Center, apic-$AZURE_ENV_NAME."
     $apicId = ""
     $apicName = ""
+    $topicName = ""
 }
 else {
     Write-Output "Azure Event Grid will be connected to the existing API Center, $ApicName."
@@ -92,6 +93,6 @@ $evtgrd = az deployment group create `
     --parameters environmentName="$AZURE_ENV_NAME" `
     --parameters apicId="$apicId" `
     --parameters apicName="$apicName" `
-    --parameters topicName="$topicName" `
+    --parameters topicName="$topicName"
 
 Write-Output "... Provisioned"
