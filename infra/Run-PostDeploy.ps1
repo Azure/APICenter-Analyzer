@@ -74,6 +74,11 @@ else {
         $assigned = az role assignment create --role $rdId --scope $apicId --assignee-object-id $principalId --assignee-principal-type ServicePrincipal
 
         Write-Output "... Assigned"
+
+        $topicName = az eventgrid system-topic list --query "[?source == '$apicId'] | [0].name" -o tsv
+        if (($topicName -ne $null) -and ($topicName -ne "")) {
+            Write-Output "Connecting $apicName to $topicName ..."
+        }
     }
 }
 
@@ -86,6 +91,7 @@ $evtgrd = az deployment group create `
     --template-file "$($repositoryRoot)/infra/eventGrid.bicep" `
     --parameters environmentName="$AZURE_ENV_NAME" `
     --parameters apicId="$apicId" `
-    --parameters apicName="$apicName"
+    --parameters apicName="$apicName" `
+    --parameters topicName="$topicName" `
 
 Write-Output "... Provisioned"
