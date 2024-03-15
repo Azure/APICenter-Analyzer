@@ -21,11 +21,13 @@ USAGE
 AZURE_ENV_NAME=""
 APIC_ID=""
 APIC_NAME=""
+TOPIC_NAME=""
 
 if [[ $# -eq 0 ]]; then
     AZURE_ENV_NAME=""
     APIC_ID=""
     APIC_NAME=""
+    TOPIC_NAME=""
 fi
 
 while [[ "$1" != "" ]]; do
@@ -56,13 +58,14 @@ done
 
 RESOURCE_GROUP_NAME="rg-$AZURE_ENV_NAME"
 
-repositoryRoot=$(git rev-parse --show-toplevel)
+REPOSITORY_ROOT=$(git rev-parse --show-toplevel)
 
 # Check API instance
 if [[ -z "$APIC_NAME" ]]; then
     echo "Azure Event Grid will be connected to the new API Center, apic-$AZURE_ENV_NAME."
     APIC_ID=""
     APIC_NAME=""
+    TOPIC_NAME=""
 else
     echo "Azure Event Grid will be connected to the existing API Center, $APIC_NAME."
     apic=$(az resource list -n $APIC_NAME)
@@ -80,6 +83,11 @@ else
         assigned=$(az role assignment create --role $ROLE_DEFINITION_ID --scope $APIC_ID --assignee-object-id $PRINCIPAL_ID --assignee-principal-type ServicePrincipal)
 
         echo "... Assigned"
+
+        TOPIC_NAME=$(az eventgrid system-topic list --query "[?source == '$APIC_ID'] | [0].name" -o tsv)
+        if [[ -n "$TOPIC_NAME" ]]; then
+            echo "Connecting $APIC_NAME to $TOPIC_NAME ..."
+        fi
     fi
 fi
 
@@ -93,9 +101,10 @@ fi
 evtgrd=$(az deployment group create \
     -g $RESOURCE_GROUP_NAME \
     -n "eventgrid-$AZURE_ENV_NAME" \
-    --template-file "$repositoryRoot/infra/eventGrid.bicep" \
+    --template-file "$REPOSITORY_ROOT/infra/eventGrid.bicep" \
     --parameters environmentName="$AZURE_ENV_NAME" \
     --parameters apicId="$APIC_ID" \
-    --parameters apicName="$APIC_NAME")
+    --parameters apicName="$APIC_NAME" \
+    --parameters topicName="$TOPIC_NAME")
 
 echo "... Provisioned"
