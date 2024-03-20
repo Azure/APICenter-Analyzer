@@ -68,8 +68,9 @@ Alternatively, if you'd like to use [Azure Developer CLI](https://learn.microsof
 
    While you're running `azd init`, you will be asked to provide:
 
-   - An environment name: Any name you want to give to your environment.
+   - How to initialize: Choose the `Select a template` option, then `Y`.
    - A template: Choose the `Minimal template` option. <!-- This option will be changed to "API Center Analyzer" once this PR is merged, which is not available at this time of PR -->
+   - An environment name: Any name you want to give to your environment.
 
 1. Run the following command to provision and deploy this analyzer to Azure:
 
