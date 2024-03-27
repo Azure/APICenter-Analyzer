@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: API Center Analyzer
+
+metadata:
+  template: api-center-analyzer@0.0.1-beta
+
+infra:
+  provider: bicep
+  path: infra
+  module: main
+
+services:
+  functionapp:
+    host: function
+    project: .
+    language: ts
+    resourceName: "fncapp-${AZURE_ENV_NAME}-linter"
+
+hooks:
+  postdeploy:
+    windows:
+      shell: pwsh
+      run: |
+        ./infra/hooks/Run-PostDeploy.ps1 -Environment "${env:AZURE_ENV_NAME}" -ApicName "${env:APIC_NAME}"
+      continueOnError: false
+      interactive: false
+    posix:
+      shell: sh
+      run: |
+        ./infra/hooks/run-postdeploy.sh --environment "${AZURE_ENV_NAME}" --apic-name "${APIC_NAME}"
+      continueOnError: false
+      interactive: false
