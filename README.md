@@ -6,6 +6,7 @@
   - :briefcase: API Governance & Azure API Center
   - :briefcase: API Analysis in Azure API Center (Overview)
 - :rocket: [How to Run](#rocket-how-to-set-up-api-analysis)
+  - :wrench: Configure your environment
   - :wrench: How to deploy
   - :cloud: How to debug your function locally
 - :page_facing_up: [Custom Ruleset](#page_facing_up-custom-rulesets)
@@ -92,6 +93,8 @@ Alternatively, if you'd like to use [Azure Developer CLI](https://learn.microsof
    - API Center (if `apicName` is not provided)
    - Application Insights (if `useMonitoring` is set to `yes`)
    - Log Analytics (if `useMonitoring` is set to `yes`)
+
+   > **NOTE**: If you are on MacOS, you may need to install `jq` to run the `azd up` commands.
 
 ### :wrench: Configure & run your function locally
 

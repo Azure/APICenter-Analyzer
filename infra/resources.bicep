@@ -9,23 +9,25 @@ param tags object = {}
 var shortname = '${replace(replace(environmentName, '-', ''), '_', '')}${suffix}'
 var longname = '${environmentName}${suffix == null || suffix == '' ? '' : '-'}${suffix}'
 
-resource apic 'Microsoft.ApiCenter/services@2024-03-01' = if (apicName == null || apicName == '') {
-  name: 'apic-${environmentName}'
-  location: location
-  tags: tags
-  identity: {
-    type: 'SystemAssigned'
+resource apic 'Microsoft.ApiCenter/services@2024-03-01' =
+  if (apicName == null || apicName == '') {
+    name: 'apic-${environmentName}'
+    location: location
+    tags: tags
+    identity: {
+      type: 'SystemAssigned'
+    }
   }
-}
 
-resource apicWorkspace 'Microsoft.ApiCenter/services/workspaces@2024-03-01' = if (apicName == null || apicName == '') {
-  name: 'default'
-  parent: apic
-  properties: {
-    title: 'Default Workspace'
-    description: 'Default workspace'
+resource apicWorkspace 'Microsoft.ApiCenter/services/workspaces@2024-03-01' =
+  if (apicName == null || apicName == '') {
+    name: 'default'
+    parent: apic
+    properties: {
+      title: 'Default Workspace'
+      description: 'Default workspace'
+    }
   }
-}
 
 resource st 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: 'st${shortname}'
@@ -40,36 +42,38 @@ resource st 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   }
 }
 
-resource wrkspc 'Microsoft.OperationalInsights/workspaces@2022-10-01' = if (useMonitoring == true) {
-  name: 'wrkspc-${longname}'
-  location: location
-  tags: tags
-  properties: {
-    sku: {
-      name: 'PerGB2018'
+resource wrkspc 'Microsoft.OperationalInsights/workspaces@2022-10-01' =
+  if (useMonitoring == true) {
+    name: 'wrkspc-${longname}'
+    location: location
+    tags: tags
+    properties: {
+      sku: {
+        name: 'PerGB2018'
+      }
+      retentionInDays: 30
+      workspaceCapping: {
+        dailyQuotaGb: -1
+      }
+      publicNetworkAccessForIngestion: 'Enabled'
+      publicNetworkAccessForQuery: 'Enabled'
     }
-    retentionInDays: 30
-    workspaceCapping: {
-      dailyQuotaGb: -1
-    }
-    publicNetworkAccessForIngestion: 'Enabled'
-    publicNetworkAccessForQuery: 'Enabled'
   }
-}
 
-resource appins 'Microsoft.Insights/components@2020-02-02' = if (useMonitoring == true) {
-  name: 'appins-${longname}'
-  location: location
-  kind: 'web'
-  tags: tags
-  properties: {
-    Application_Type: 'web'
-    Flow_Type: 'Bluefield'
-    IngestionMode: 'LogAnalytics'
-    Request_Source: 'rest'
-    WorkspaceResourceId: wrkspc.id
+resource appins 'Microsoft.Insights/components@2020-02-02' =
+  if (useMonitoring == true) {
+    name: 'appins-${longname}'
+    location: location
+    kind: 'web'
+    tags: tags
+    properties: {
+      Application_Type: 'web'
+      Flow_Type: 'Bluefield'
+      IngestionMode: 'LogAnalytics'
+      Request_Source: 'rest'
+      WorkspaceResourceId: wrkspc.id
+    }
   }
-}
 
 resource csplan 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: 'csplan-${longname}'
@@ -112,16 +116,20 @@ var commonSettings = [
   }
 ]
 
-var appSettings = concat(commonSettings, useMonitoring == true ? [
-    {
-      name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-      value: useMonitoring == true ? appins.properties.InstrumentationKey : null
-    }
-    {
-      name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-      value: useMonitoring == true ? appins.properties.ConnectionString : null
-    }
-  ] : []
+var appSettings = concat(
+  commonSettings,
+  useMonitoring == true
+    ? [
+        {
+          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: useMonitoring == true ? appins.properties.InstrumentationKey : null
+        }
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: useMonitoring == true ? appins.properties.ConnectionString : null
+        }
+      ]
+    : []
 )
 
 resource fncapp 'Microsoft.Web/sites@2023-01-01' = {
@@ -154,25 +162,40 @@ var policies = [
   }
 ]
 
-resource fncappPolicies 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2023-01-01' = [for policy in policies: {
-  name: policy.name
-  parent: fncapp
-  properties: {
-    allow: policy.allow
+resource fncappPolicies 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2023-01-01' = [
+  for policy in policies: {
+    name: policy.name
+    parent: fncapp
+    properties: {
+      allow: policy.allow
+    }
   }
-}]
+]
 
-resource contributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = if (apicName == null || apicName == '') {
-  scope: apic
-  name: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
-}
-
-resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (apicName == null || apicName == '') {
-  name: guid(resourceGroup().id, fncapp.id, contributorRoleDefinition.id)
-  scope: apic
-  properties: {
-    roleDefinitionId: contributorRoleDefinition.id
-    principalId: fncapp.identity.principalId
-    principalType: 'ServicePrincipal'
+module roleAssignment './roleAssignment.bicep' =
+  if (apicName == null || apicName == '') {
+    name: 'RoleAssignment'
+    dependsOn: [
+      apic
+      fncapp
+    ]
+    params: {
+      environmentName: environmentName
+      apicName: 'apic-${environmentName}'
+    }
   }
-}
+
+// resource contributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = if (apicName == null || apicName == '') {
+//   scope: apic
+//   name: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+// }
+
+// resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (apicName == null || apicName == '') {
+//   name: guid(resourceGroup().id, fncapp.id, contributorRoleDefinition.id)
+//   scope: apic
+//   properties: {
+//     roleDefinitionId: contributorRoleDefinition.id
+//     principalId: fncapp.identity.principalId
+//     principalType: 'ServicePrincipal'
+//   }
+// }

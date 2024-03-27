@@ -46,53 +46,66 @@ if ($Environment -eq $null) {
 
 $AZURE_ENV_NAME = $Environment
 $RESOURCE_GROUP_NAME = "rg-$AZURE_ENV_NAME"
+$APIC_ID = ""
+$APIC_NAME = "$ApicName"
+$APIC_RESOURCE_GROUP_NAME = ""
+$TOPIC_NAME = ""
 
-$repositoryRoot = git rev-parse --show-toplevel
+$REPOSITORY_ROOT = git rev-parse --show-toplevel
 
 # Check APIC instance
-if (($ApicName -eq $null) -or ($ApicName -eq "")) {
+if (($APIC_NAME -eq $null) -or ($APIC_NAME -eq "")) {
     Write-Output "Azure Event Grid will be connected to the new API Center, apic-$AZURE_ENV_NAME."
-    $apicId = ""
-    $apicName = ""
-    $topicName = ""
+    $APIC_ID = ""
+    $APIC_NAME = "$ApicName"
+    $APIC_RESOURCE_GROUP_NAME = "$RESOURCE_GROUP_NAME"
+    $TOPIC_NAME = ""
 }
 else {
-    Write-Output "Azure Event Grid will be connected to the existing API Center, $ApicName."
-    $apic = az resource list -n $ApicName | ConvertFrom-Json
+    Write-Output "Azure Event Grid will be connected to the existing API Center, $APIC_NAME."
+    $apic = az resource list -n $APIC_NAME | ConvertFrom-Json
     if ($apic -eq $null) {
         Write-Output "API Center instance not found to connect"
         Exit 0
     }
     else {
-        $apicId = $apic[0].id
-        $apicName = $ApicName
-        $RESOURCE_GROUP_NAME = $apic[0].resourceGroup
+        $APIC_ID = $apic[0].id
+        $APIC_NAME = "$ApicName"
+        $APIC_RESOURCE_GROUP_NAME = $apic[0].resourceGroup
 
-        Write-Output "Assigning role to $apicName ..."
+        Write-Output "Assigning role to $APIC_NAME ..."
 
-        $rdId = az role definition list -n "b24988ac-6180-42a0-ab88-20f7382dd24c" --scope $apicId --query "[0].id" -o tsv
-        $principalId = az resource list -n "fncapp-$AZURE_ENV_NAME-linter" --query "[0].identity.principalId" -o tsv
-        $assigned = az role assignment create --role $rdId --scope $apicId --assignee-object-id $principalId --assignee-principal-type ServicePrincipal
+        $assigned = az deployment group create `
+            -g $APIC_RESOURCE_GROUP_NAME `
+            -n "roleassignment-$AZURE_ENV_NAME" `
+            --template-file "$($REPOSITORY_ROOT)/infra/roleAssignment.bicep" `
+            --parameters environmentName="$AZURE_ENV_NAME" `
+            --parameters apicName="$APIC_NAME" `
+            --parameters resourceGroupName="$RESOURCE_GROUP_NAME"
+
+        # $ROLE_DEFINITION_ID = az role definition list -n "b24988ac-6180-42a0-ab88-20f7382dd24c" --scope $APIC_ID --query "[0].id" -o tsv
+        # $PRINCIPAL_ID = az resource list -n "fncapp-$AZURE_ENV_NAME-linter" --query "[0].identity.principalId" -o tsv
+        # $assigned = az role assignment create --role $ROLE_DEFINITION_ID --scope $APIC_ID --assignee-object-id $PRINCIPAL_ID --assignee-principal-type ServicePrincipal
 
         Write-Output "... Assigned"
 
-        $topicName = az eventgrid system-topic list --query "[?source == '$apicId'] | [0].name" -o tsv
-        if (($topicName -ne $null) -and ($topicName -ne "")) {
-            Write-Output "Connecting $apicName to $topicName ..."
+        $TOPIC_NAME = az eventgrid system-topic list --query "[?source == '$APIC_ID'] | [0].name" -o tsv
+        if (($TOPIC_NAME -ne $null) -and ($TOPIC_NAME -ne "")) {
+            Write-Output "Connecting $APIC_NAME to $TOPIC_NAME ..."
         }
     }
 }
 
 # Provision Azure Event Grid
-Write-Output "Provisioning Azure Event Grid to $(($ApicName -eq $null) -or ($ApicName -eq '') ? "apic-$AZURE_ENV_NAME" : $apicName) ..."
+Write-Output "Provisioning Azure Event Grid to $(($APIC_NAME -eq $null) -or ($APIC_NAME -eq '') ? "apic-$AZURE_ENV_NAME" : $APIC_NAME) ..."
 
 $evtgrd = az deployment group create `
-    -g $RESOURCE_GROUP_NAME `
+    -g $APIC_RESOURCE_GROUP_NAME `
     -n "eventgrid-$AZURE_ENV_NAME" `
-    --template-file "$($repositoryRoot)/infra/eventGrid.bicep" `
+    --template-file "$($REPOSITORY_ROOT)/infra/eventGrid.bicep" `
     --parameters environmentName="$AZURE_ENV_NAME" `
-    --parameters apicId="$apicId" `
-    --parameters apicName="$apicName" `
-    --parameters topicName="$topicName"
+    --parameters apicId="$APIC_ID" `
+    --parameters apicName="$APIC_NAME" `
+    --parameters topicName="$TOPIC_NAME"
 
 Write-Output "... Provisioned"
