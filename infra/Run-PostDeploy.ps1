@@ -83,10 +83,6 @@ else {
             --parameters apicName="$APIC_NAME" `
             --parameters resourceGroupName="$RESOURCE_GROUP_NAME"
 
-        # $ROLE_DEFINITION_ID = az role definition list -n "b24988ac-6180-42a0-ab88-20f7382dd24c" --scope $APIC_ID --query "[0].id" -o tsv
-        # $PRINCIPAL_ID = az resource list -n "fncapp-$AZURE_ENV_NAME-linter" --query "[0].identity.principalId" -o tsv
-        # $assigned = az role assignment create --role $ROLE_DEFINITION_ID --scope $APIC_ID --assignee-object-id $PRINCIPAL_ID --assignee-principal-type ServicePrincipal
-
         Write-Output "... Assigned"
 
         $TOPIC_NAME = az eventgrid system-topic list --query "[?source == '$APIC_ID'] | [0].name" -o tsv

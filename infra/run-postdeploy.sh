@@ -21,12 +21,14 @@ USAGE
 AZURE_ENV_NAME=""
 APIC_ID=""
 APIC_NAME=""
+APIC_RESOURCE_GROUP_NAME=""
 TOPIC_NAME=""
 
 if [[ $# -eq 0 ]]; then
     AZURE_ENV_NAME=""
     APIC_ID=""
     APIC_NAME=""
+    APIC_RESOURCE_GROUP_NAME=""
     TOPIC_NAME=""
 fi
 
@@ -64,7 +66,8 @@ REPOSITORY_ROOT=$(git rev-parse --show-toplevel)
 if [[ -z "$APIC_NAME" ]]; then
     echo "Azure Event Grid will be connected to the new API Center, apic-$AZURE_ENV_NAME."
     APIC_ID=""
-    APIC_NAME=""
+    APIC_NAME="apic-$AZURE_ENV_NAME"
+    APIC_RESOURCE_GROUP_NAME="$RESOURCE_GROUP_NAME"
     TOPIC_NAME=""
 else
     echo "Azure Event Grid will be connected to the existing API Center, $APIC_NAME."
@@ -74,13 +77,17 @@ else
         exit 0
     else
         APIC_ID=$(echo $apic | jq -r ".[0].id")
-        RESOURCE_GROUP_NAME=$(echo $apic | jq -r ".[0].resourceGroup")
+        APIC_RESOURCE_GROUP_NAME=$(echo $apic | jq -r ".[0].resourceGroup")
 
         echo "Assigning role to $APIC_NAME ..."
 
-        ROLE_DEFINITION_ID=$(az role definition list -n "b24988ac-6180-42a0-ab88-20f7382dd24c" --scope $APIC_ID --query "[0].id" -o tsv)
-        PRINCIPAL_ID=$(az resource list -n "fncapp-$AZURE_ENV_NAME-linter" --query "[0].identity.principalId" -o tsv)
-        assigned=$(az role assignment create --role $ROLE_DEFINITION_ID --scope $APIC_ID --assignee-object-id $PRINCIPAL_ID --assignee-principal-type ServicePrincipal)
+        assigned=$(az deployment group create \
+            -g $APIC_RESOURCE_GROUP_NAME \
+            -n "roleassignment-$AZURE_ENV_NAME" \
+            --template-file "$REPOSITORY_ROOT/infra/roleAssignment.bicep" \
+            --parameters environmentName="$AZURE_ENV_NAME" \
+            --parameters apicName="$APIC_NAME" \
+            --parameters resourceGroupName="$RESOURCE_GROUP_NAME")
 
         echo "... Assigned"
 
@@ -99,7 +106,7 @@ else
 fi
 
 evtgrd=$(az deployment group create \
-    -g $RESOURCE_GROUP_NAME \
+    -g $APIC_RESOURCE_GROUP_NAME \
     -n "eventgrid-$AZURE_ENV_NAME" \
     --template-file "$REPOSITORY_ROOT/infra/eventGrid.bicep" \
     --parameters environmentName="$AZURE_ENV_NAME" \

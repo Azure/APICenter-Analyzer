@@ -174,7 +174,7 @@ resource fncappPolicies 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@
 
 module roleAssignment './roleAssignment.bicep' =
   if (apicName == null || apicName == '') {
-    name: 'RoleAssignment'
+    name: 'apic-${environmentName}-role-assignment'
     dependsOn: [
       apic
       fncapp
@@ -184,18 +184,3 @@ module roleAssignment './roleAssignment.bicep' =
       apicName: 'apic-${environmentName}'
     }
   }
-
-// resource contributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = if (apicName == null || apicName == '') {
-//   scope: apic
-//   name: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
-// }
-
-// resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (apicName == null || apicName == '') {
-//   name: guid(resourceGroup().id, fncapp.id, contributorRoleDefinition.id)
-//   scope: apic
-//   properties: {
-//     roleDefinitionId: contributorRoleDefinition.id
-//     principalId: fncapp.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
