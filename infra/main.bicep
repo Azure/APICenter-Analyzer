@@ -42,7 +42,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
 }
 
 module resources './resources.bicep' = {
-  name: 'Resources'
+  name: 'module-resources'
   scope: rg
   params: {
     environmentName: environmentName

@@ -1,5 +1,6 @@
 param environmentName string
 param suffix string = 'linter'
+
 param apicName string
 param resourceGroupName string = resourceGroup().name
 
