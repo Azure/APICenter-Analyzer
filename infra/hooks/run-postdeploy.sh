@@ -62,6 +62,23 @@ RESOURCE_GROUP_NAME="rg-$AZURE_ENV_NAME"
 
 REPOSITORY_ROOT=$(git rev-parse --show-toplevel)
 
+# Check whether the function app is deployed and ready for use
+function=$(az functionapp function list \
+    -g $RESOURCE_GROUP_NAME \
+    -n fncapp-$AZURE_ENV_NAME-linter \
+    --query "[?name == 'fncapp-$AZURE_ENV_NAME-linter/apicenter-analyzer']")
+while [[ -z "$function" ]]
+do
+    echo "Waiting for the function app to be available ..."
+
+    sleep 10
+
+    function=$(az functionapp function list \
+        -g $RESOURCE_GROUP_NAME \
+        -n fncapp-$AZURE_ENV_NAME-linter \
+        --query "[?name == 'fncapp-$AZURE_ENV_NAME-linter/apicenter-analyzer']")
+done
+
 # Check API instance
 if [[ -z "$APIC_NAME" ]]; then
     echo "Azure Event Grid will be connected to the new API Center, apic-$AZURE_ENV_NAME."
@@ -84,7 +101,7 @@ else
         assigned=$(az deployment group create \
             -g $APIC_RESOURCE_GROUP_NAME \
             -n "roleassignment-$AZURE_ENV_NAME" \
-            --template-file "$REPOSITORY_ROOT/infra/roleAssignment.bicep" \
+            --template-file "$REPOSITORY_ROOT/infra/core/security/roleAssignment.bicep" \
             --parameters environmentName="$AZURE_ENV_NAME" \
             --parameters apicName="$APIC_NAME" \
             --parameters resourceGroupName="$RESOURCE_GROUP_NAME")
@@ -108,7 +125,7 @@ fi
 evtgrd=$(az deployment group create \
     -g $APIC_RESOURCE_GROUP_NAME \
     -n "eventgrid-$AZURE_ENV_NAME" \
-    --template-file "$REPOSITORY_ROOT/infra/eventGrid.bicep" \
+    --template-file "$REPOSITORY_ROOT/infra/apps/eventGrid.bicep" \
     --parameters environmentName="$AZURE_ENV_NAME" \
     --parameters apicId="$APIC_ID" \
     --parameters apicName="$APIC_NAME" \
