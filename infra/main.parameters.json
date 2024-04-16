@@ -11,8 +11,11 @@
     "useMonitoring": {
       "value": "${USE_MONITORING}"
     },
-    "apicName": {
+    "apiCenterName": {
       "value": "${APIC_NAME}"
+    },
+    "apiCenterResourceGroupName": {
+      "value": "${APIC_RESOURCE_GROUP_NAME}"
     }
   }
 }
