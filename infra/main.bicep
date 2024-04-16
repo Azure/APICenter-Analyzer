@@ -101,7 +101,7 @@ module function './core/host/functions.bicep' = {
 }
 
 // Create the api center
-module apiCenter './app/api-center.bicep' =
+module apiCenter './core//gateway/api-center.bicep' =
   if (createAPIC) {
     name: 'apicenter'
     scope: rg
