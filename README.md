@@ -71,6 +71,12 @@ azd up
 
 Enter an environment name and select your desired `subscription` and `location`. Then choose whether to create the monitoring resources. If you want to use an existing api center resource, pass the values for `apiCenterName` and `apiCenterResourceGroupName`. Otherwise leave them blank to create a new one. Wait a moment for the resource deployment to complete. Then you can upload your own api definition for test.
 
+There are four scenarios:
+1. New `APIC` with `monitoring`. You need to leave `apiCenterName` and `apiCenterResourceGroupName` blank and set `useMonitoring` to "True".
+2. New `APIC` without `monitoring`. You need to leave `apiCenterName` and `apiCenterResourceGroupName` blank and set `useMonitoring` to "False".
+3. Existing `APIC` with `monitoring`. You need to fill in `apiCenterName` and `apiCenterResourceGroupName` with an existing resource and set `useMonitoring` to "True".
+4. Existing `APIC` without `monitoring`. You need to fill in `apiCenterName` and `apiCenterResourceGroupName` with an existing resource and set `useMonitoring` to "False".
+
 (Optional) You can also set the Env variables manually using the following command to skip setting them during the `azd up` process.
 ```
 azd env set USE_MONITORING <true/false>
