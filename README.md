@@ -4,19 +4,20 @@
 
 ## Overview
 
-- :bulb: [What is Azure API Center?](./#-what-is-azure-api-center)
+- :bulb: [What is Azure API Center?](./#bulb-what-is-azure-api-center)
   - :memo: API Governance & Azure API Center
   - :memo: API Analysis in Azure API Center (Overview)
-- :rocket: [How to Run](./#-how-to-run-api-analysis)
+- :rocket: [How to Run](./#rocket-how-to-run-api-analysis)
   - :wrench: Configure your environment
   - :wrench: Running the sample using the Azure Developer CLI (azd)
   - :wrench: Configure & run your function locally
-- :package: [How to deploy](./#-how-to-deploy)
-- :page_facing_up: [Custom Ruleset](./#-custom-ruleset)
-- :pencil2: [Contributing](./#-contributing)
-- :construction: [Code of Conduct](./#-code-of-conduct)
-- :ok_hand: [Trademark Notice](./#-trademark-notice)
-- :mag: [Telemetry](./#-telemetry)
+- :package: [How to deploy](./#package-how-to-deploy)
+- :page_facing_up: [Custom Ruleset](./#page_facing_up-custom-ruleset)
+- :pencil2: [Contributing](./#pencil2-contributing)
+- :sunny: [Bugs & Issues & Feedback](./#sunny-bugs--issues--feedback)
+- :construction: [Code of Conduct](./#construction-code-of-conduct)
+- :ok_hand: [Trademark Notice](./#ok_hand-trademark-notice)
+- :mag: [Telemetry](./#mag-telemetry)
 
 ## :bulb: What is Azure API Center?
 
