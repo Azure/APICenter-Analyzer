@@ -1,3 +1,5 @@
+[![Open Source Love](https://firstcontributions.github.io/open-source-badges/badges/open-source-v1/open-source.svg)](https://github.com/firstcontributions/open-source-badges)
+
 # Analyze your API Specs with Azure API Center (Preview)
 
 ## Overview
@@ -65,6 +67,7 @@ az login
 ```
 
 Then, run `azd up` to provision all the resources to Azure and deploy the code to those resources.
+
 ```
 azd up
 ```
@@ -72,12 +75,14 @@ azd up
 Enter an environment name and select your desired `subscription` and `location`. Then choose whether to create the monitoring resources. If you want to use an existing api center resource, pass the values for `apiCenterName` and `apiCenterResourceGroupName`. Otherwise leave them blank to create a new one. Wait a moment for the resource deployment to complete. Then you can upload your own api definition for test.
 
 There are four scenarios:
+
 1. New `APIC` with `monitoring`. You need to leave `apiCenterName` and `apiCenterResourceGroupName` blank and set `useMonitoring` to "True".
 2. New `APIC` without `monitoring`. You need to leave `apiCenterName` and `apiCenterResourceGroupName` blank and set `useMonitoring` to "False".
 3. Existing `APIC` with `monitoring`. You need to fill in `apiCenterName` and `apiCenterResourceGroupName` with an existing resource and set `useMonitoring` to "True".
 4. Existing `APIC` without `monitoring`. You need to fill in `apiCenterName` and `apiCenterResourceGroupName` with an existing resource and set `useMonitoring` to "False".
 
 (Optional) You can also set the Env variables manually using the following command to skip setting them during the `azd up` process.
+
 ```
 azd env set USE_MONITORING <true/false>
 
@@ -109,6 +114,18 @@ If you want to customize your Ruleset for analysis, simply swap out the default 
 ## :pencil2: Contributing
 
 See [the contribution guidelines](CONTRIBUTING.md) for ideas and guidance on how to improve the template. Thank you!
+
+## :sunny: Bugs & Issues & Feedback
+
+We Love Hearing From You!
+
+Your feedback is invaluable to us, and we encourage you to share your thoughts and suggestions in the repository's **Issues** section. You can also report bugs or submit feature requests there. Rest assured, we’ll be keeping a close eye on your input to continuously improve. While we’re dedicated to monitoring these issues, please note that this channel is not part of our Microsoft Azure Service Support.
+
+**Microsoft Azure Support** assistance is limited to the initial setup of the Azure Function app that runs the linting engine. Best effort support is provided for problems that are caused by environmental factors, such as (but not limited to): hosting platform, development environment, network configuration.
+
+If you need technical assistance with extending the linting engine or improving existing rules , please leverage existing technical communities such as Stack Overflow. We don't provide support through GitHub Issues.
+
+We welcome and appreciate community contributions.
 
 ## :construction: Code of Conduct
 
