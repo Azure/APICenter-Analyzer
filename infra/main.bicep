@@ -35,6 +35,7 @@ param apiCenterName string
 param logAnalyticsName string = ''
 param applicationInsightsName string = ''
 param applicationInsightsDashboardName string = ''
+param diagnosticsSettingsName string = ''
 
 param resourceGroupName string = ''
 param apiCenterResourceGroupName string
@@ -79,6 +80,7 @@ module storageAccount './core/storage/storage-account.bicep' = {
     name: !empty(storageAccountName) ? storageAccountName : '${abbrs.storageStorageAccounts}${resourceToken}'
     location: location
     tags: tags
+    allowBlobPublicAccess: false
   }
 }
 
@@ -99,6 +101,19 @@ module function './core/host/functions.bicep' = {
     alwaysOn: false
   }
 }
+
+// Integrate Diagnostics settings
+module diagnostics './core/monitor/appservice-diagnosticsettings.bicep' =
+  if (useMonitoring) {
+    name: 'diagnostics'
+    scope: rg
+    params: {
+      name: !empty(diagnosticsSettingsName) ? diagnosticsSettingsName : 'diag-${resourceToken}'
+      logAnalyticsName: monitoring.outputs.logAnalyticsWorkspaceName
+      appServiceName: function.outputs.name
+      kind: 'functionapp'
+    }
+  }
 
 // Create the api center
 module apiCenter './core//gateway/api-center.bicep' =
@@ -159,3 +174,6 @@ output AZURE_API_CENTER_ID string = createAPIC
   ? apiCenter.outputs.id
   : resourceId(subscription().subscriptionId, apiCenterRG.name, 'Microsoft.ApiCenter/services', apiCenterName)
 output AZURE_FUNCTION_NAME string = function.outputs.name
+output APIC_NAME string = apiCenter.outputs.name
+output APIC_RESOURCE_GROUP_NAME string = createAPIC ? rg.name : apiCenterRG.name
+output USE_MONITORING bool = useMonitoring

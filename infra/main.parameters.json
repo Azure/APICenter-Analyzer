@@ -9,7 +9,7 @@
       "value": "${AZURE_LOCATION}"
     },
     "useMonitoring": {
-      "value": "${USE_MONITORING}"
+      "value": "${USE_MONITORING=true}"
     },
     "apiCenterName": {
       "value": "${APIC_NAME}"

@@ -1,15 +1,17 @@
 name: Validate AZD template
 on:
-  push:
-    branches: 
-      - main
-    paths:
-      - "infra/**"
-  pull_request:
-    branches: 
-      - main
-    paths:
-      - "infra/**"
+  # push:
+  #   branches:
+  #     - main
+  #     - preview
+  #   paths:
+  #     - "infra/**"
+  # pull_request:
+  #   branches:
+  #     - main
+  #     - preview
+  #   paths:
+  #     - "infra/**"
   workflow_dispatch:
 
 jobs:

@@ -1,3 +1,5 @@
+name: AZD Deploy
+
 on:
   workflow_dispatch:
   push:
@@ -18,6 +20,7 @@ permissions:
 
 jobs:
   build:
+    if: ${{ vars.AZURE_CLIENT_ID != '' || vars.AZURE_CREDENTIALS != '' }}
     runs-on: ubuntu-latest
 
     env:
@@ -81,6 +84,9 @@ jobs:
           AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
           AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          USE_MONITORING: ${{ vars.USE_MONITORING }}
+          APIC_NAME: ${{ vars.APIC_NAME }}
+          APIC_RESOURCE_GROUP_NAME: ${{ vars.APIC_RESOURCE_GROUP_NAME }}
 
       - name: Deploy Application
         run: azd deploy --no-prompt
@@ -88,3 +94,6 @@ jobs:
           AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
           AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          USE_MONITORING: ${{ vars.USE_MONITORING }}
+          APIC_NAME: ${{ vars.APIC_NAME }}
+          APIC_RESOURCE_GROUP_NAME: ${{ vars.APIC_RESOURCE_GROUP_NAME }}
