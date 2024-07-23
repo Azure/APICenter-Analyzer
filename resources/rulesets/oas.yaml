@@ -1,0 +1,3 @@
+# Source: https://docs.stoplight.io/docs/spectral/4dec24461f3af-open-api-rules
+extends:
+  - spectral:oas

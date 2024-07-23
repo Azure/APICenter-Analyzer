@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: api-center-analyzer
+metadata:
+  template: api-center-analyzer@0.0.1-beta
+services:
+  function:
+    project: .
+    language: ts
+    host: function
+hooks:
+  preup:
+    posix:
+      shell: sh
+      run: infra/hooks/preup.sh
+      continueOnError: false
+      interactive: true
+    windows:
+      shell: pwsh
+      run: infra/hooks/preup.ps1
+      continueOnError: false
+      interactive: true
+  preprovision:
+    posix:
+      shell: sh
+      run: infra/hooks/preprovision.sh
+      continueOnError: false
+      interactive: true
+    windows:
+      shell: pwsh
+      run: infra/hooks/preprovision.ps1
+      continueOnError: false
+      interactive: true
+  postdeploy:
+    posix:
+      shell: sh
+      run: infra/hooks/postdeploy.sh
+      continueOnError: false
+      interactive: true
+    windows:
+      shell: pwsh
+      run: infra/hooks/postdeploy.ps1
+      continueOnError: false
+      interactive: true
+  predown:
+    posix:
+      shell: sh
+      continueOnError: false
+      interactive: true
+      run: infra/hooks/predown.sh
+    windows:
+      shell: pwsh
+      continueOnError: false
+      interactive: true
+      run: infra/hooks/predown.ps1
